@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Der Die Das</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@500;700;800&display=swap">
+<style>
+:root{--bg:#f6f5f1;--surface:#fff;--text:#1d2230;--muted:#6b7183;--line:#dedbd2;--der:#2f6fed;--die:#d8394f;--das:#1f9467;--on:#fff;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);color-scheme:light}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#14171f;--surface:#1e222d;--text:#eceef4;--muted:#99a0b4;--line:#323848;--der:#5b92ff;--die:#ff6a7e;--das:#3ccb94;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#14171f;--surface:#1e222d;--text:#eceef4;--muted:#99a0b4;--line:#323848;--der:#5b92ff;--die:#ff6a7e;--das:#3ccb94;color-scheme:dark}
+*{box-sizing:border-box}
+html,body{margin:0;min-height:100%}
+body{background:var(--bg);color:var(--text);font-family:"Bricolage Grotesque",system-ui,-apple-system,"Segoe UI",sans-serif;font-weight:500}
+.app{max-width:480px;margin:0 auto;padding:14px 16px 28px}
+header{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px}
+h1{font-size:26px;font-weight:800;margin:0;letter-spacing:-.02em}
+h1 .d{color:var(--der)}h1 .i{color:var(--die)}h1 .a{color:var(--das)}
+.info{width:38px;height:38px;border-radius:50%;border:2px solid var(--text);background:none;color:var(--text);font:italic 800 20px Georgia,serif;cursor:pointer}
+.tabs{display:grid;grid-template-columns:1fr 1fr;background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:4px;margin-bottom:16px}
+.tab{border:0;background:none;color:var(--muted);font:700 15px inherit;font-family:inherit;padding:10px;border-radius:10px;cursor:pointer}
+.tab.on{background:var(--text);color:var(--bg)}
+.sel{width:100%;padding:11px 12px;border-radius:12px;border:1px solid var(--line);background:var(--surface);color:var(--text);font:600 15px inherit;font-family:inherit;margin-bottom:14px}
+.stats{display:flex;gap:8px;margin-bottom:14px}
+.stat{flex:1;background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:8px 10px}
+.stat b{display:block;font-size:20px;font-weight:800}
+.stat span{font-size:12px;color:var(--muted)}
+.bar{height:8px;background:var(--line);border-radius:6px;overflow:hidden;margin-bottom:6px}
+.bar i{display:block;height:100%;background:var(--das);transition:width .3s}
+.cap{font-size:13px;color:var(--muted);margin-bottom:14px}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:22px;min-height:250px;padding:26px 20px;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;gap:10px;cursor:pointer;user-select:none}
+.card.flip{animation:flip .3s}
+@keyframes flip{from{transform:rotateX(70deg);opacity:.3}to{transform:none;opacity:1}}
+.eng{font-size:34px;font-weight:800;letter-spacing:-.02em}
+.hint{font-size:14px;color:var(--muted)}
+.art{font-size:20px;font-weight:800}
+.word{font-size:40px;font-weight:800;letter-spacing:-.02em;word-break:break-word}
+.word mark{background:none;border-bottom:4px solid currentColor;padding-bottom:1px}
+.note{font-size:15px;color:var(--muted);max-width:30ch}
+.c-der{color:var(--der)}.c-die{color:var(--die)}.c-das{color:var(--das)}
+.row{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:14px}
+.btn{border:0;border-radius:14px;padding:15px;font:700 16px inherit;font-family:inherit;cursor:pointer;color:var(--on);background:var(--text);color:var(--bg)}
+.btn.ghost{background:var(--surface);color:var(--text);border:1px solid var(--line)}
+.btn:disabled{opacity:.35;cursor:default}
+.btn.full{width:100%;margin-top:14px}
+.three{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:14px}
+.g{border:0;border-radius:16px;padding:20px 4px;font:800 22px inherit;font-family:inherit;color:#fff;cursor:pointer}
+.g.der{background:#2f6fed}.g.die{background:#d8394f}.g.das{background:#1f9467}
+.g.dim{opacity:.3}.g.right{outline:4px solid var(--text);outline-offset:2px}
+.fb{margin-top:14px;background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:14px 16px}
+.fb strong{font-size:18px}
+.fb p{margin:4px 0 0;color:var(--muted);font-size:15px}
+.lives{font-size:20px;letter-spacing:2px}
+.over{text-align:center;padding:30px 10px}
+.over .big{font-size:56px;font-weight:800;margin:6px 0}
+.modal{position:fixed;inset:0;background:rgba(10,12,18,.55);display:none;align-items:flex-end;justify-content:center;z-index:20}
+.modal.show{display:flex}
+.sheet{background:var(--surface);width:100%;max-width:480px;border-radius:22px 22px 0 0;padding:20px 18px calc(22px + env(safe-area-inset-bottom,0px));max-height:90%;overflow:auto}
+.sheet h2{margin:0 0 12px;font-size:21px}
+.rule{border-left:6px solid;padding:4px 0 4px 12px;margin-bottom:14px}
+.rule b{font-size:19px}
+.rule .e{font-size:16px;margin-top:2px}
+.rule small{color:var(--muted);font-size:14px}
+</style>
+</head>
+<body>
+<div class="app">
+  <header>
+    <h1><span class="d">Der</span> <span class="i">Die</span> <span class="a">Das</span></h1>
+    <button class="info" onclick="openInfo(true)" aria-label="Ending rules">i</button>
+  </header>
+  <div class="tabs">
+    <button class="tab on" id="t-flash" onclick="setTab('flash')">Flashcards</button>
+    <button class="tab" id="t-game" onclick="setTab('game')">Game</button>
+  </div>
+  <select class="sel" id="topic" onchange="setTopic(this.value)" aria-label="Topic"></select>
+  <main id="main"></main>
+</div>
+
+<div class="modal" id="modal" onclick="if(event.target===this)openInfo(false)">
+  <div class="sheet">
+    <h2>How to guess the article</h2>
+    <div class="rule" style="border-color:var(--text)"><b>First: natural gender</b><div class="e">Male people are der, female people are die.</div><small>der Vater, der Bruder, die Mutter, die Schwester. Exceptions: das Mädchen, das Baby, das Kind.</small></div>
+    <p class="hint" style="margin:0 0 12px">If that doesn’t apply, look at the ending:</p>
+    <div class="rule c-der" style="border-color:var(--der)"><b>der (masculine)</b><div class="e">-er, -ling, -ismus, -ig, -ich</div><small>der Lehrer, der Frühling, der König</small></div>
+    <div class="rule c-die" style="border-color:var(--die)"><b>die (feminine)</b><div class="e">-ung, -heit, -keit, -schaft, -ion, -ität, -e</div><small>die Zeitung, die Freiheit, die Lampe</small></div>
+    <div class="rule c-das" style="border-color:var(--das)"><b>das (neuter)</b><div class="e">-chen, -lein, -ment, -um, -tum</div><small>das Mädchen, das Dokument, das Museum</small></div>
+    <p class="hint" style="margin:0 0 12px">These are guides, not laws. Words like der Käse and die Mutter break them.</p>
+    <button class="btn full" style="margin-top:0" onclick="openInfo(false)">Got it</button>
+  </div>
+</div>
+
+<script>
+var R={der:['er','ling','ismus','ig','ich'],die:['ung','heit','keit','schaft','ion','ität','e'],das:['chen','lein','ment','um','tum']};
+var T={
+'People':'der|Vater|father,die|Mutter|mother,der|Bruder|brother,die|Schwester|sister,der|Sohn|son,die|Tochter|daughter,das|Kind|child,der|Mann|man,die|Frau|woman,der|Junge|boy,das|Mädchen|girl,der|Freund|friend (male),die|Freundin|friend (female),der|Mensch|person,die|Familie|family,der|Onkel|uncle,die|Tante|aunt,der|Großvater|grandfather,die|Großmutter|grandmother,der|Herr|gentleman,der|Name|name,das|Baby|baby,der|Nachbar|neighbour,der|Gast|guest,der|Kollege|colleague,der|Chef|boss,der|Arzt|doctor,die|Ärztin|female doctor,der|Lehrer|teacher,die|Lehrerin|female teacher,der|Schüler|pupil,der|Student|student,der|Verkäufer|salesman',
+'Food and drink':'das|Essen|food,das|Frühstück|breakfast,das|Mittagessen|lunch,das|Abendessen|dinner,das|Brot|bread,das|Brötchen|bread roll,die|Butter|butter,der|Käse|cheese,die|Wurst|sausage,das|Fleisch|meat,der|Fisch|fish,das|Ei|egg,das|Obst|fruit,das|Gemüse|vegetables,der|Apfel|apple,die|Banane|banana,die|Kartoffel|potato,der|Reis|rice,die|Suppe|soup,der|Salat|salad,der|Kuchen|cake,die|Schokolade|chocolate,der|Zucker|sugar,das|Salz|salt,die|Milch|milk,das|Wasser|water,der|Kaffee|coffee,der|Tee|tea,der|Saft|juice,das|Bier|beer,der|Wein|wine,das|Getränk|drink,das|Restaurant|restaurant,die|Speisekarte|menu,die|Rechnung|bill,das|Glas|glass,die|Flasche|bottle,die|Tasse|cup,der|Teller|plate,der|Löffel|spoon,das|Messer|knife,die|Gabel|fork,die|Pizza|pizza,die|Tomate|tomato,das|Eis|ice cream',
+'Home':'das|Haus|house,die|Wohnung|apartment,das|Zimmer|room,die|Küche|kitchen,das|Bad|bathroom,das|Schlafzimmer|bedroom,das|Wohnzimmer|living room,der|Flur|hallway,der|Balkon|balcony,der|Garten|garden,die|Tür|door,das|Fenster|window,der|Tisch|table,der|Stuhl|chair,das|Bett|bed,der|Schrank|cupboard,das|Sofa|sofa,die|Lampe|lamp,der|Fernseher|television,der|Computer|computer,das|Telefon|telephone,die|Uhr|clock,der|Spiegel|mirror,der|Boden|floor,die|Wand|wall,die|Treppe|stairs,der|Aufzug|lift,die|Miete|rent,der|Schlüssel|key,die|Toilette|toilet,die|Dusche|shower,das|Licht|light,die|Heizung|heating,das|Regal|shelf,der|Teppich|carpet',
+'City and places':'die|Stadt|city,das|Dorf|village,das|Land|country,die|Straße|street,der|Platz|square,das|Zentrum|centre,die|Bank|bank,die|Post|post office,die|Apotheke|pharmacy,das|Krankenhaus|hospital,die|Schule|school,die|Universität|university,der|Kindergarten|nursery school,die|Kirche|church,das|Museum|museum,das|Kino|cinema,das|Theater|theatre,die|Bibliothek|library,der|Park|park,das|Hotel|hotel,der|Supermarkt|supermarket,der|Markt|market,das|Geschäft|shop,die|Bäckerei|bakery,das|Café|café,die|Ecke|corner,die|Brücke|bridge,der|Spielplatz|playground,das|Schwimmbad|swimming pool,die|Polizei|police,der|Flughafen|airport,die|Adresse|address',
+'Travel':'der|Bahnhof|train station,der|Zug|train,der|Bus|bus,die|Straßenbahn|tram,die|U-Bahn|underground,das|Auto|car,das|Fahrrad|bicycle,das|Taxi|taxi,das|Flugzeug|aeroplane,der|Flug|flight,das|Schiff|ship,die|Haltestelle|stop,das|Gleis|platform,die|Fahrkarte|ticket,die|Reise|trip,der|Urlaub|holiday,der|Koffer|suitcase,die|Tasche|bag,der|Pass|passport,die|Karte|map,der|Weg|way,die|Ampel|traffic light,der|Verkehr|traffic,die|Grenze|border,das|Ziel|destination,der|Ausflug|excursion,das|Gepäck|luggage,der|Stadtplan|city map,die|Abfahrt|departure,die|Ankunft|arrival',
+'Time':'die|Zeit|time,der|Tag|day,die|Woche|week,der|Monat|month,das|Jahr|year,die|Stunde|hour,die|Minute|minute,die|Sekunde|second,der|Morgen|morning,der|Vormittag|late morning,der|Mittag|noon,der|Nachmittag|afternoon,der|Abend|evening,die|Nacht|night,das|Wochenende|weekend,der|Montag|Monday,der|Dienstag|Tuesday,der|Mittwoch|Wednesday,der|Donnerstag|Thursday,der|Freitag|Friday,der|Samstag|Saturday,der|Sonntag|Sunday,der|Frühling|spring,der|Sommer|summer,der|Herbst|autumn,der|Winter|winter,das|Datum|date,der|Termin|appointment,der|Geburtstag|birthday,das|Fest|celebration,die|Party|party,der|Feiertag|public holiday,die|Pause|break,der|Anfang|beginning,das|Ende|end',
+'Body and health':'der|Körper|body,der|Kopf|head,das|Gesicht|face,das|Auge|eye,das|Ohr|ear,die|Nase|nose,der|Mund|mouth,der|Zahn|tooth,das|Haar|hair,der|Hals|neck,der|Arm|arm,die|Hand|hand,der|Finger|finger,das|Bein|leg,der|Fuß|foot,der|Bauch|stomach,der|Rücken|back,das|Herz|heart,die|Gesundheit|health,die|Krankheit|illness,der|Schmerz|pain,das|Fieber|fever,die|Erkältung|cold,das|Medikament|medicine,die|Tablette|tablet,der|Husten|cough',
+'Clothes and shopping':'die|Kleidung|clothing,das|Hemd|shirt,das|T-Shirt|T-shirt,die|Hose|trousers,der|Rock|skirt,das|Kleid|dress,die|Jacke|jacket,der|Mantel|coat,der|Pullover|sweater,der|Schuh|shoe,die|Socke|sock,die|Mütze|cap,der|Hut|hat,die|Brille|glasses,der|Preis|price,das|Geld|money,der|Euro|euro,der|Cent|cent,die|Kasse|checkout,die|Größe|size,die|Farbe|colour,das|Geschenk|gift,die|Tüte|carrier bag,das|Angebot|offer,der|Kunde|customer',
+'Work and school':'die|Arbeit|work,der|Beruf|profession,die|Firma|company,das|Büro|office,der|Job|job,der|Kurs|course,die|Klasse|class,der|Unterricht|lesson,die|Prüfung|exam,die|Hausaufgabe|homework,die|Aufgabe|task,das|Buch|book,das|Heft|notebook,der|Stift|pen,der|Kugelschreiber|ballpoint pen,das|Papier|paper,die|Tafel|board,das|Wort|word,der|Satz|sentence,die|Frage|question,die|Antwort|answer,das|Beispiel|example,die|Sprache|language,die|Zahl|number,die|Nummer|phone number,der|Fehler|mistake,das|Wörterbuch|dictionary,die|Übung|exercise,der|Test|test,das|Problem|problem,die|Idee|idea',
+'Nature and weather':'das|Wetter|weather,die|Sonne|sun,der|Regen|rain,der|Schnee|snow,der|Wind|wind,die|Wolke|cloud,der|Himmel|sky,die|Temperatur|temperature,der|Grad|degree,der|Baum|tree,die|Blume|flower,der|Wald|forest,der|Berg|mountain,der|See|lake,das|Meer|sea,der|Fluss|river,der|Strand|beach,das|Tier|animal,der|Hund|dog,die|Katze|cat,der|Vogel|bird,das|Pferd|horse,die|Kuh|cow,die|Welt|world,die|Natur|nature',
+'Daily life':'das|Handy|mobile phone,die|E-Mail|email,der|Brief|letter,die|Nachricht|message,das|Foto|photo,das|Bild|picture,die|Zeitung|newspaper,das|Radio|radio,der|Film|film,die|Musik|music,das|Lied|song,das|Spiel|game,der|Sport|sport,der|Fußball|football,das|Hobby|hobby,die|Freizeit|free time,das|Internet|internet,die|Webseite|website,das|Passwort|password,der|Text|text,die|Information|information,das|Leben|life,das|Glück|luck,die|Hilfe|help,der|Ausweis|ID card,die|Unterschrift|signature,das|Formular|form,das|Alter|age,der|Familienname|surname,der|Vorname|first name,die|Staatsangehörigkeit|nationality,der|Wunsch|wish,der|Spaß|fun,das|Konzert|concert'};
+var RAW=[];Object.keys(T).forEach(function(k){T[k].split(',').forEach(function(s){var p=s.split('|');RAW.push({g:p[0],w:p[1],e:p[2],t:k})})});
+var topic='All';
+function pool(){return topic==='All'?RAW:RAW.filter(function(x){return x.t===topic})}
+function rule(w){var l=w.toLowerCase(),b=null;for(var g in R)R[g].forEach(function(e){if(l.endsWith(e)&&(!b||e.length>b.e.length))b={g:g,e:e}});return b}
+RAW.forEach(function(x){var r=rule(x.w);x.r=r;x.easy=!!r&&r.g===x.g});
+var NAT_SKIP=['Familie','Name','Mensch','Gast'];
+function nat(x){return x.t==='People'&&NAT_SKIP.indexOf(x.w)<0||x.w==='Kuh'}
+function note(x){if(nat(x)){if(x.g==='das')return 'Exception: neuter, even though it means a person.';return 'Natural gender: '+(x.g==='der'?'male':'female')+', so '+x.g+'.'}if(!x.r)return 'No ending rule here. Learn it by heart.';if(x.r.g===x.g)return 'The ending -'+x.r.e+' usually means '+x.g+'.';return 'Exception: -'+x.r.e+' is usually '+x.r.g+', but this one is '+x.g+'.'}
+function hl(x){if(!x.r||nat(x))return x.w;var n=x.w.length-x.r.e.length;return x.w.slice(0,n)+'<mark class="c-'+x.r.g+'">'+x.w.slice(n)+'</mark>'}
+function shuffle(a){a=a.slice();for(var i=a.length-1;i>0;i--){var j=Math.floor(Math.random()*(i+1));var t=a[i];a[i]=a[j];a[j]=t}return a}
+var $=function(id){return document.getElementById(id)};
+var tab='flash';
+function setTab(t){tab=t;$('t-flash').classList.toggle('on',t==='flash');$('t-game').classList.toggle('on',t==='game');if(t==='flash')render();else{if(!G.cur&&!G.over)gStart();render()}}
+function openInfo(v){$('modal').classList.toggle('show',v)}
+
+/* Flashcards */
+var F={queue:[],done:0,total:0,flipped:false,anim:false};
+function fStart(){F.queue=shuffle(pool());F.done=0;F.total=F.queue.length;F.flipped=false}
+function fFlip(){F.flipped=!F.flipped;F.anim=true;render()}
+function fNext(ok){var c=F.queue.shift();if(ok)F.done++;else F.queue.push(c);F.flipped=false;F.anim=false;render()}
+function fRender(){
+  if(!F.queue.length)return '<div class="over"><div class="hint">All cards learned</div><div class="big">'+F.total+'/'+F.total+'</div><button class="btn full" onclick="fStart();render()">Study again</button></div>';
+  var c=F.queue[0],pct=Math.round(F.done/F.total*100);
+  var h='<div class="bar"><i style="width:'+pct+'%"></i></div>';
+  if(!F.flipped)h+='<div class="card" onclick="fFlip()"><div class="word">'+c.w+'</div></div>';
+  else h+='<div class="card'+(F.anim?' flip':'')+'" onclick="fFlip()"><div class="art c-'+c.g+'">'+c.g+'</div><div class="word c-'+c.g+'">'+hl(c)+'</div><div class="hint">'+c.e+'</div></div>';
+  h+='<button class="btn full" onclick="fNext(true)">Next</button>';
+  return h}
+
+/* Game */
+var G={lives:3,score:0,streak:0,best:0,right:0,cur:null,pick:null,over:false,seen:[],hi:0};
+try{G.hi=+localStorage.getItem('ddd-hi')||0}catch(e){}
+function level(){return 1+Math.floor(G.right/5)}
+function gStart(){G.lives=3;G.score=0;G.streak=0;G.best=0;G.right=0;G.pick=null;G.over=false;G.seen=[];gNext()}
+function gNext(){var P=pool(),a=P.filter(function(x){return(level()>=3||x.easy)&&G.seen.indexOf(x)<0});if(!a.length){G.seen=[];a=P.filter(function(x){return level()>=3||x.easy})}if(!a.length)a=P;G.cur=a[Math.floor(Math.random()*a.length)];G.seen.push(G.cur);G.pick=null}
+function gAnswer(g){if(G.pick)return;G.pick=g;if(g===G.cur.g){G.right++;G.streak++;G.best=Math.max(G.best,G.streak);G.gain=10+Math.min(G.streak-1,5)*2;G.score+=G.gain}else{G.lives--;G.streak=0;if(G.lives<=0){G.over=true;if(G.score>G.hi){G.hi=G.score;try{localStorage.setItem('ddd-hi',G.hi)}catch(e){}}}}render()}
+function gRender(){
+  if(G.over&&G.pick===null||G.over&&G.pick&&G.done)return '';
+  var hearts='';for(var i=0;i<3;i++)hearts+=i<G.lives?'❤️':'🖤';
+  var h='<div class="stats"><div class="stat"><b>'+G.score+'</b><span>Points</span></div><div class="stat"><b>'+G.streak+'</b><span>Streak</span></div><div class="stat"><b>'+level()+'</b><span>Level</span></div><div class="stat"><b class="lives">'+hearts+'</b><span>Lives</span></div></div>';
+  var c=G.cur,ans=G.pick;
+  h+='<div class="card" style="cursor:default"><div class="word">'+(ans?hl(c):c.w)+'</div></div>';
+  h+='<div class="three">';
+  ['der','die','das'].forEach(function(g){var cl='g '+g;if(ans){if(g===c.g)cl+=' right';else if(g!==ans)cl+=' dim'}h+='<button class="'+cl+'" onclick="gAnswer(\''+g+'\')">'+g+'</button>'});
+  h+='</div>';
+  if(ans){var ok=ans===c.g;h+='<div class="fb"><strong class="'+(ok?'c-das':'c-die')+'">'+(ok?'Correct! +'+G.gain:'It’s '+c.g+' '+c.w)+'</strong><p>'+c.e+'. '+note(c)+'</p></div>';
+    h+=G.over?'<button class="btn full" onclick="G.done=1;render()">See result</button>':'<button class="btn full" onclick="gNext();render()">Next word</button>'}
+  return h}
+function gOver(){return '<div class="over"><div class="hint">Game over</div><div class="big">'+G.score+'</div><div class="hint">Best streak '+G.best+' · Level '+level()+' · High score '+G.hi+'</div><button class="btn full" onclick="G.done=0;gStart();render()">Play again</button></div>'}
+
+function render(){
+  var m=$('main');
+  if(tab==='flash')m.innerHTML=fRender();
+  else m.innerHTML=(G.over&&G.done)?gOver():gRender()
+}
+function setTopic(v){topic=v;fStart();G.done=0;G.cur=null;G.over=false;if(tab==='game')gStart();render()}
+$('topic').innerHTML='<option value="All">All topics ('+RAW.length+' nouns)</option>'+Object.keys(T).map(function(k){return'<option value="'+k+'">'+k+' ('+T[k].split(',').length+')</option>'}).join('');
+fStart();render();
+</script>
+</body>
+</html>

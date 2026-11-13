@@ -1,0 +1,1416 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>German A1 Trainer – Flashcards & Quiz</title>
+<style>
+:root{
+  --bg:#f4f5fb;--panel:#ffffff;--text:#1d2033;--muted:#6b7090;--line:#e3e5f1;
+  --accent:#4f46e5;--accent2:#7c3aed;--good:#16a34a;--goodbg:#dcfce7;--bad:#dc2626;--badbg:#fee2e2;
+  --der:#2563eb;--die:#db2777;--das:#059669;--shadow:0 10px 30px rgba(40,40,90,.12);
+}
+@media (prefers-color-scheme:dark){
+  :root{--bg:#12131c;--panel:#1b1d2b;--text:#eceef8;--muted:#9a9fc0;--line:#2c2f45;
+  --goodbg:#12361f;--badbg:#431a1a;--shadow:0 10px 30px rgba(0,0,0,.45);--der:#60a5fa;--die:#f472b6;--das:#34d399;}
+}
+*{box-sizing:border-box}
+body{margin:0;font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;background:var(--bg);color:var(--text);min-height:100vh}
+header{padding:22px 16px 8px;text-align:center}
+h1{margin:0;font-size:1.6rem;letter-spacing:-.02em}
+.sub{color:var(--muted);font-size:.9rem;margin-top:4px}
+.tabs{display:flex;gap:8px;justify-content:center;margin:14px 0}
+.tabs button{border:1px solid var(--line);background:var(--panel);color:var(--text);padding:10px 22px;border-radius:999px;font-size:1rem;font-weight:600;cursor:pointer}
+.tabs button.active{background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;border-color:transparent}
+main{max-width:760px;margin:0 auto;padding:0 16px 40px}
+.bar{display:flex;flex-wrap:wrap;gap:10px;align-items:center;justify-content:center;margin-bottom:14px}
+select,input[type=number]{padding:9px 12px;border-radius:10px;border:1px solid var(--line);background:var(--panel);color:var(--text);font-size:.95rem}
+label.chk{display:flex;gap:6px;align-items:center;font-size:.92rem;color:var(--muted)}
+.btn{border:1px solid var(--line);background:var(--panel);color:var(--text);padding:10px 16px;border-radius:12px;font-size:.95rem;font-weight:600;cursor:pointer}
+.btn:hover{border-color:var(--accent)}
+.btn.primary{background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;border:none}
+.btn.good{background:var(--goodbg);color:var(--good);border-color:transparent}
+.btn.bad{background:var(--badbg);color:var(--bad);border-color:transparent}
+.btn:disabled{opacity:.4;cursor:not-allowed}
+.counter{text-align:center;color:var(--muted);font-size:.9rem;margin:6px 0 12px}
+.scene{perspective:1200px;height:300px;margin:0 auto 16px;max-width:560px}
+.card{position:relative;width:100%;height:100%;transform-style:preserve-3d;transition:transform .55s cubic-bezier(.3,.8,.3,1);cursor:pointer}
+.card.flipped{transform:rotateY(180deg)}
+.face{position:absolute;inset:0;backface-visibility:hidden;-webkit-backface-visibility:hidden;border-radius:22px;background:var(--panel);box-shadow:var(--shadow);border:1px solid var(--line);display:flex;flex-direction:column;align-items:center;justify-content:center;padding:24px;text-align:center}
+.face.back{transform:rotateY(180deg);background:linear-gradient(160deg,var(--panel),color-mix(in srgb,var(--accent) 10%,var(--panel)))}
+.word{font-size:2.3rem;font-weight:700;line-height:1.2;word-break:break-word}
+.word.long{font-size:1.5rem}
+.art{font-weight:700}.art.der{color:var(--der)}.art.die{color:var(--die)}.art.das{color:var(--das)}
+.tag{position:absolute;top:14px;left:16px;font-size:.72rem;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);max-width:60%;text-align:left}
+.type{position:absolute;top:12px;right:14px;font-size:.72rem;padding:3px 10px;border-radius:999px;background:var(--line);color:var(--muted);font-weight:600}
+.hint{position:absolute;bottom:12px;font-size:.78rem;color:var(--muted)}
+.speak{position:absolute;bottom:10px;right:12px;border:none;background:var(--line);width:36px;height:36px;border-radius:50%;cursor:pointer;font-size:1rem}
+.row{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-bottom:10px}
+.panel{background:var(--panel);border:1px solid var(--line);border-radius:18px;padding:22px;box-shadow:var(--shadow)}
+.chips{display:flex;gap:8px;flex-wrap:wrap;margin:8px 0 14px}
+.chip{border:1px solid var(--line);background:var(--bg);color:var(--text);padding:8px 16px;border-radius:999px;cursor:pointer;font-weight:600}
+.chip.on{background:var(--accent);color:#fff;border-color:var(--accent)}
+.field{margin:16px 0}.field>span{display:block;font-weight:700;margin-bottom:4px}
+.qhead{display:flex;justify-content:space-between;color:var(--muted);font-size:.9rem;margin-bottom:8px}
+.prog{height:8px;background:var(--line);border-radius:99px;overflow:hidden;margin-bottom:18px}
+.prog>i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--accent),var(--accent2));transition:width .3s}
+.q{text-align:center;margin:10px 0 20px}
+.q small{display:block;color:var(--muted);margin-bottom:6px;font-size:.85rem}
+.q .word{font-size:2rem}
+.opts{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+@media(max-width:560px){.opts{grid-template-columns:1fr}.word{font-size:1.9rem}}
+.opt{display:flex;gap:10px;align-items:center;text-align:left;padding:13px 14px;border-radius:14px;border:2px solid var(--line);background:var(--panel);color:var(--text);font-size:1rem;cursor:pointer;min-height:56px}
+.opt:hover:not(:disabled){border-color:var(--accent)}
+.opt b{flex:none;width:24px;height:24px;border-radius:7px;background:var(--line);color:var(--muted);display:grid;place-items:center;font-size:.78rem}
+.opt.right{background:var(--goodbg);border-color:var(--good)}
+.opt.wrong{background:var(--badbg);border-color:var(--bad)}
+.feedback{min-height:48px;margin:16px 0 8px;text-align:center;font-weight:600}
+.feedback.ok{color:var(--good)}.feedback.no{color:var(--bad)}
+.score{font-size:3.2rem;font-weight:800;text-align:center;background:linear-gradient(135deg,var(--accent),var(--accent2));-webkit-background-clip:text;background-clip:text;color:transparent}
+.missed{max-height:300px;overflow:auto;border:1px solid var(--line);border-radius:12px;margin:14px 0}
+.missed div{padding:8px 12px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;gap:10px;font-size:.95rem}
+.missed div:last-child{border:none}
+.missed span:last-child{color:var(--muted);text-align:right}
+.center{text-align:center}
+[hidden]{display:none!important}
+</style>
+</head>
+<body>
+<header>
+  <h1>🇩🇪 German A1 Trainer</h1>
+  <div class="sub" id="stats"></div>
+</header>
+<div class="tabs">
+  <button class="active" data-tab="cards">🃏 Flashcards</button>
+  <button data-tab="quiz">🎮 Quiz game</button>
+</div>
+
+<main>
+<!-- FLASHCARDS -->
+<section id="cards">
+  <div class="bar">
+    <select id="fcCat" aria-label="Category"></select>
+    <select id="fcDir" aria-label="Direction">
+      <option value="de">Front: German</option>
+      <option value="en">Front: English</option>
+    </select>
+    <label class="chk"><input type="checkbox" id="hideKnown"> Hide known</label>
+    <button class="btn" id="shuffleBtn">🔀 Shuffle</button>
+  </div>
+  <div class="counter" id="fcCounter"></div>
+  <div class="scene"><div class="card" id="card">
+    <div class="face front"><div class="tag" id="fTag"></div><div class="type" id="fType"></div><div class="word" id="fWord"></div><div class="hint">Click card to flip</div></div>
+    <div class="face back"><div class="tag" id="bTag"></div><div class="type" id="bType"></div><div class="word" id="bWord"></div><button class="speak" id="speakBtn" title="Pronounce">🔊</button></div>
+  </div></div>
+  <div class="row">
+    <button class="btn" id="prevBtn">← Prev</button>
+    <button class="btn bad" id="againBtn">✗ Still learning</button>
+    <button class="btn good" id="knownBtn">✓ I know it</button>
+    <button class="btn" id="nextBtn">Next →</button>
+  </div>
+  <div class="counter">Keyboard: ← → to move, Space to flip, K = known</div>
+  <div class="center"><button class="btn" id="resetKnown">Reset my progress</button></div>
+</section>
+
+<!-- QUIZ -->
+<section id="quiz" hidden>
+  <div class="panel" id="setup">
+    <h2 style="margin-top:0">Set up your quiz</h2>
+    <div class="field"><span>Number of questions</span>
+      <div class="chips" id="numChips"></div>
+      <input type="number" id="numInput" min="1" value="10"> <span id="poolInfo" style="display:inline;font-weight:400;color:var(--muted)"></span>
+    </div>
+    <div class="field"><span>Category</span><select id="qCat"></select></div>
+    <div class="field"><span>Question type</span>
+      <select id="qDir">
+        <option value="de">German → English</option>
+        <option value="en">English → German</option>
+        <option value="mix">Mixed</option>
+      </select>
+    </div>
+    <button class="btn primary" id="startQuiz" style="width:100%;padding:14px">Start quiz</button>
+  </div>
+
+  <div id="play" hidden>
+    <div class="qhead"><span id="qNum"></span><span id="qScore"></span></div>
+    <div class="prog"><i id="qProg"></i></div>
+    <div class="panel">
+      <div class="q"><small id="qPrompt"></small><div class="word" id="qWord"></div></div>
+      <div class="opts" id="opts"></div>
+      <div class="feedback" id="feedback"></div>
+      <div class="row"><button class="btn" id="qSpeak">🔊 Hear German</button><button class="btn primary" id="qNext" disabled>Next →</button></div>
+    </div>
+  </div>
+
+  <div class="panel" id="result" hidden>
+    <div class="center">Your score</div>
+    <div class="score" id="rScore"></div>
+    <div class="center" id="rMsg" style="font-weight:600"></div>
+    <div id="rMissedWrap">
+      <h3>Words to review</h3>
+      <div class="missed" id="missed"></div>
+    </div>
+    <div class="row">
+      <button class="btn primary" id="retryMissed">Retry missed words</button>
+      <button class="btn" id="newQuiz">New quiz</button>
+    </div>
+  </div>
+</section>
+</main>
+
+<script>
+/* ====== DATA: "German|English" per line, "#" starts a category ====== */
+const RAW = `#1 Pronouns & determiners
+ich|I
+du|you (informal)
+er|he
+sie|she / they
+es|it
+wir|we
+ihr|you (plural informal)
+Sie|you (formal)
+mich|me
+dich|you (object)
+ihn|him
+uns|us
+euch|you (plural object)
+mir|to me
+dir|to you
+ihm|to him
+ihnen|to them
+mein|my
+dein|your
+sein|his / its
+unser|our
+euer|your (plural)
+dieser|this
+jeder|every / each
+alle|all
+sich|himself / herself / themselves
+man|one / you (in general)
+#2 Questions, articles & connectors
+wer|who
+was|what
+wann|when
+wo|where
+wohin|where to
+woher|where from
+warum|why
+wie|how
+welcher|which
+wie viel|how much
+wie viele|how many
+der|the (masculine)
+die|the (feminine / plural)
+das|the (neuter)
+ein|a / an (masculine / neuter)
+eine|a / an (feminine)
+kein|no / not a
+und|and
+oder|or
+aber|but
+denn|because
+weil|because
+dass|that (conjunction)
+wenn|if / when
+auch|also / too
+#3 Essential verbs
+sein|to be
+haben|to have
+werden|to become
+können|can / to be able to
+müssen|must / to have to
+dürfen|to be allowed to
+sollen|should / to be supposed to
+wollen|to want
+mögen|to like
+möchten|would like
+machen|to do / make
+tun|to do
+gehen|to go / walk
+kommen|to come
+bleiben|to stay
+wohnen|to live / reside
+leben|to live
+heißen|to be called
+sprechen|to speak
+sagen|to say
+fragen|to ask
+antworten|to answer
+verstehen|to understand
+wissen|to know a fact
+kennen|to know / be familiar with
+#4 Everyday actions
+essen|to eat
+trinken|to drink
+schlafen|to sleep
+aufstehen|to get up
+aufwachen|to wake up
+duschen|to shower
+baden|to bathe
+waschen|to wash
+sich anziehen|to get dressed
+sich ausziehen|to get undressed
+putzen|to clean
+kochen|to cook
+backen|to bake
+einkaufen|to shop
+bezahlen|to pay
+arbeiten|to work
+lernen|to learn
+lesen|to read
+schreiben|to write
+hören|to hear / listen
+sehen|to see
+schauen|to look / watch
+suchen|to look for
+finden|to find
+brauchen|to need
+#5 More useful verbs
+geben|to give
+nehmen|to take
+bringen|to bring
+holen|to fetch
+kaufen|to buy
+verkaufen|to sell
+bestellen|to order
+öffnen|to open
+schließen|to close
+anfangen|to begin
+aufhören|to stop
+warten|to wait
+helfen|to help
+treffen|to meet
+besuchen|to visit
+anrufen|to call by telephone
+telefonieren|to talk on the phone
+schicken|to send
+bekommen|to receive
+zeigen|to show
+erklären|to explain
+wiederholen|to repeat
+kosten|to cost
+fehlen|to be missing
+passen|to fit / suit
+#6 Movement & leisure verbs
+fahren|to travel by vehicle / drive
+fliegen|to fly
+laufen|to run / walk
+spazieren gehen|to go for a walk
+schwimmen|to swim
+tanzen|to dance
+singen|to sing
+spielen|to play
+reisen|to travel
+wandern|to hike
+fotografieren|to photograph
+malen|to paint
+zeichnen|to draw
+fernsehen|to watch television
+zuhören|to listen attentively
+mitkommen|to come along
+einsteigen|to get in / board
+aussteigen|to get out / alight
+umsteigen|to change transport
+abfahren|to depart
+ankommen|to arrive
+zurückkommen|to come back
+mitbringen|to bring along
+abholen|to pick up
+einladen|to invite
+#7 People & family
+der Mensch|human / person
+die Person|person
+der Mann|man / husband
+die Frau|woman / wife
+das Kind|child
+das Baby|baby
+der Junge|boy
+das Mädchen|girl
+die Familie|family
+die Eltern|parents
+der Vater|father
+die Mutter|mother
+der Sohn|son
+die Tochter|daughter
+der Bruder|brother
+die Schwester|sister
+die Geschwister|siblings
+der Großvater|grandfather
+die Großmutter|grandmother
+der Onkel|uncle
+die Tante|aunt
+der Freund|male friend / boyfriend
+die Freundin|female friend / girlfriend
+der Partner|male partner
+die Partnerin|female partner
+#8 Personal info & relationships
+der Name|name
+der Vorname|first name
+der Nachname|surname
+das Alter|age
+die Adresse|address
+die Straße|street
+die Hausnummer|house number
+die Postleitzahl|postal code
+der Wohnort|place of residence
+das Land|country
+die Stadt|city
+das Dorf|village
+die Nationalität|nationality
+die Sprache|language
+der Geburtstag|birthday
+der Geburtsort|place of birth
+verheiratet|married
+ledig|single / unmarried
+geschieden|divorced
+getrennt|separated / apart
+der Nachbar|male neighbour
+die Nachbarin|female neighbour
+der Gast|guest
+die Hochzeit|wedding
+das Paar|couple / pair
+#9 Home & furniture
+das Haus|house
+die Wohnung|flat / apartment
+das Zimmer|room
+das Wohnzimmer|living room
+das Schlafzimmer|bedroom
+die Küche|kitchen
+das Bad|bathroom
+die Toilette|toilet
+der Flur|hallway
+der Balkon|balcony
+der Garten|garden
+die Tür|door
+das Fenster|window
+die Wand|wall
+der Boden|floor / ground
+die Treppe|stairs
+der Aufzug|lift / elevator
+der Tisch|table
+der Stuhl|chair
+das Bett|bed
+das Sofa|sofa
+der Schrank|cupboard / wardrobe
+das Regal|shelf / shelving unit
+die Lampe|lamp
+der Schlüssel|key
+#10 Household objects
+der Kühlschrank|refrigerator
+der Herd|cooker / stove
+der Ofen|oven
+die Waschmaschine|washing machine
+die Heizung|heating
+die Dusche|shower
+die Badewanne|bathtub
+der Spiegel|mirror
+das Handtuch|towel
+die Seife|soap
+die Zahnbürste|toothbrush
+die Zahnpasta|toothpaste
+das Toilettenpapier|toilet paper
+die Decke|blanket / ceiling
+das Kissen|pillow / cushion
+die Uhr|clock / watch
+das Bild|picture
+der Teller|plate
+die Tasse|cup
+das Glas|glass
+die Flasche|bottle
+das Messer|knife
+die Gabel|fork
+der Löffel|spoon
+der Topf|cooking pot
+#11 Food
+das Brot|bread
+das Brötchen|bread roll
+die Butter|butter
+der Käse|cheese
+das Ei|egg
+das Fleisch|meat
+der Fisch|fish
+das Hähnchen|chicken
+der Reis|rice
+die Nudeln|noodles / pasta
+die Kartoffel|potato
+das Gemüse|vegetables
+das Obst|fruit
+der Apfel|apple
+die Banane|banana
+die Orange|orange
+die Zitrone|lemon
+die Tomate|tomato
+die Gurke|cucumber
+die Zwiebel|onion
+der Salat|salad / lettuce
+die Suppe|soup
+der Kuchen|cake
+die Schokolade|chocolate
+das Eis|ice cream / ice
+#12 Drinks & eating out
+das Wasser|water
+das Mineralwasser|mineral water
+der Kaffee|coffee
+der Tee|tea
+die Milch|milk
+der Saft|juice
+das Bier|beer
+der Wein|wine
+der Zucker|sugar
+das Salz|salt
+der Pfeffer|pepper
+das Öl|oil
+das Frühstück|breakfast
+das Mittagessen|lunch
+das Abendessen|dinner
+der Hunger|hunger
+der Durst|thirst
+das Restaurant|restaurant
+das Café|café
+die Speisekarte|menu
+die Rechnung|bill / invoice
+das Trinkgeld|tip
+lecker|tasty
+vegetarisch|vegetarian
+satt|full after eating
+#13 Shopping & money
+der Laden|shop
+das Geschäft|shop / business
+der Supermarkt|supermarket
+der Markt|market
+die Bäckerei|bakery
+die Metzgerei|butcher's shop
+die Apotheke|pharmacy
+die Kasse|checkout / till
+das Geld|money
+der Euro|euro
+der Cent|cent
+der Preis|price
+das Angebot|offer / deal
+der Rabatt|discount
+die Quittung|receipt
+die Kreditkarte|credit card
+die Bankkarte|bank card
+das Bargeld|cash
+billig|cheap
+günstig|inexpensive / favourable
+teuer|expensive
+kostenlos|free of charge
+bar|in cash
+die Größe|size
+das Kilo|kilogram
+#14 Clothing & belongings
+die Kleidung|clothing
+die Hose|trousers
+das Hemd|shirt
+das T-Shirt|T-shirt
+die Bluse|blouse
+das Kleid|dress
+der Rock|skirt
+die Jacke|jacket
+der Mantel|coat
+der Pullover|jumper / sweater
+der Schuh|shoe
+die Socke|sock
+der Hut|hat
+die Mütze|cap
+der Schal|scarf
+der Handschuh|glove
+der Gürtel|belt
+die Tasche|bag
+der Rucksack|backpack
+der Koffer|suitcase
+die Brille|glasses
+die Sonnenbrille|sunglasses
+der Regenschirm|umbrella
+der Ring|ring
+die Geldbörse|wallet / purse
+#15 Body & health
+der Körper|body
+der Kopf|head
+das Gesicht|face
+das Auge|eye
+das Ohr|ear
+die Nase|nose
+der Mund|mouth
+der Zahn|tooth
+das Haar|hair
+der Hals|neck / throat
+der Arm|arm
+die Hand|hand
+der Finger|finger
+der Bauch|belly
+der Rücken|back
+das Bein|leg
+der Fuß|foot
+das Herz|heart
+der Arzt|male doctor
+die Ärztin|female doctor
+das Krankenhaus|hospital
+der Schmerz|pain
+das Fieber|fever
+krank|ill
+gesund|healthy
+#16 Work & study
+die Arbeit|work
+der Beruf|profession
+der Job|job
+die Firma|company
+das Büro|office
+der Chef|male boss
+die Chefin|female boss
+der Kollege|male colleague
+die Kollegin|female colleague
+der Lehrer|male teacher
+die Lehrerin|female teacher
+der Schüler|male school pupil
+die Schülerin|female school pupil
+der Student|male university student
+die Studentin|female university student
+die Schule|school
+die Universität|university
+der Kurs|course
+der Unterricht|teaching / class
+die Prüfung|exam
+die Hausaufgabe|homework task
+das Buch|book
+das Heft|exercise book
+der Stift|pen / pencil
+das Papier|paper
+#17 Communication & technology
+das Telefon|telephone
+das Handy|mobile phone
+der Computer|computer
+der Laptop|laptop
+das Internet|internet
+die E-Mail|email
+die Nachricht|message / news item
+der Brief|letter
+die Post|post / postal service
+die Postkarte|postcard
+die Briefmarke|postage stamp
+das Paket|parcel
+die Nummer|number
+die Telefonnummer|telephone number
+das Foto|photo
+der Fernseher|television set
+das Radio|radio
+die Zeitung|newspaper
+die Zeitschrift|magazine
+die Webseite|webpage
+das Passwort|password
+die App|app
+klicken|to click
+drucken|to print
+speichern|to save / store
+#18 Transport & places
+das Auto|car
+der Bus|bus
+der Zug|train
+die Bahn|railway / train
+die Straßenbahn|tram
+die U-Bahn|underground train
+die S-Bahn|urban / suburban railway
+das Fahrrad|bicycle
+das Motorrad|motorcycle
+das Taxi|taxi
+das Flugzeug|aircraft
+der Bahnhof|train station
+die Haltestelle|transport stop
+der Flughafen|airport
+das Gleis|railway track / platform designation
+der Bahnsteig|railway platform
+die Fahrkarte|ticket
+der Fahrplan|timetable
+die Abfahrt|departure
+die Ankunft|arrival
+der Eingang|entrance
+der Ausgang|exit
+die Ampel|traffic light
+die Kreuzung|crossroads / intersection
+die Brücke|bridge
+#19 Travel & services
+die Reise|journey / trip
+der Urlaub|holiday
+das Hotel|hotel
+die Rezeption|reception desk
+die Reservierung|reservation
+der Pass|passport
+der Ausweis|identity document
+das Visum|visa
+das Gepäck|luggage
+der Stadtplan|city map
+die Information|information
+die Hilfe|help
+die Polizei|police
+die Bank|bank / bench
+der Geldautomat|cash machine
+die Postfiliale|post office branch
+das Rathaus|town hall
+das Formular|form
+die Unterschrift|signature
+der Termin|appointment
+buchen|to book
+reservieren|to reserve
+unterschreiben|to sign
+ausfüllen|to fill in
+übernachten|to stay overnight
+#20 Time
+die Zeit|time
+die Sekunde|second
+die Minute|minute
+die Stunde|hour
+der Tag|day
+die Woche|week
+der Monat|month
+das Jahr|year
+heute|today
+morgen|tomorrow
+gestern|yesterday
+vorgestern|the day before yesterday
+übermorgen|the day after tomorrow
+jetzt|now
+sofort|immediately
+später|later
+früh|early
+spät|late
+der Morgen|morning
+der Vormittag|late morning / before noon
+der Mittag|midday
+der Nachmittag|afternoon
+der Abend|evening
+die Nacht|night
+das Wochenende|weekend
+#21 Days, months & seasons
+Montag|Monday
+Dienstag|Tuesday
+Mittwoch|Wednesday
+Donnerstag|Thursday
+Freitag|Friday
+Samstag|Saturday
+Sonntag|Sunday
+Januar|January
+Februar|February
+März|March
+April|April
+Mai|May
+Juni|June
+Juli|July
+August|August
+September|September
+Oktober|October
+November|November
+Dezember|December
+der Frühling|spring
+der Sommer|summer
+der Herbst|autumn
+der Winter|winter
+das Datum|date
+der Kalender|calendar
+#22 Numbers & quantities
+null|zero
+eins|one
+zwei|two
+drei|three
+vier|four
+fünf|five
+sechs|six
+sieben|seven
+acht|eight
+neun|nine
+zehn|ten
+elf|eleven
+zwölf|twelve
+dreizehn|thirteen
+vierzehn|fourteen
+fünfzehn|fifteen
+sechzehn|sixteen
+siebzehn|seventeen
+achtzehn|eighteen
+neunzehn|nineteen
+zwanzig|twenty
+hundert|hundred
+tausend|thousand
+viel|much / a lot
+wenig|little / not much
+#23 Describing things
+gut|good
+schlecht|bad
+groß|big / tall
+klein|small
+lang|long
+kurz|short
+hoch|high / tall
+niedrig|low
+alt|old
+jung|young
+neu|new
+schön|beautiful / nice
+hässlich|ugly
+leicht|light / easy
+schwer|heavy / difficult
+einfach|simple / easy
+schwierig|difficult
+schnell|fast
+langsam|slow
+richtig|correct
+falsch|wrong
+wichtig|important
+möglich|possible
+fertig|finished / ready
+kaputt|broken
+#24 Feelings, conditions & colours
+glücklich|happy
+traurig|sad
+müde|tired
+wach|awake
+freundlich|friendly
+nett|nice / kind
+zufrieden|satisfied
+ruhig|quiet / calm
+laut|loud
+voll|full
+leer|empty
+sauber|clean
+schmutzig|dirty
+warm|warm
+kalt|cold
+heiß|hot
+kühl|cool
+rot|red
+blau|blue
+grün|green
+gelb|yellow
+schwarz|black
+weiß|white
+grau|grey
+braun|brown
+#25 Prepositions, place & frequency
+in|in
+an|at / on
+auf|on
+unter|under
+über|above / about
+vor|in front of / before
+hinter|behind
+neben|next to
+zwischen|between
+mit|with
+ohne|without
+für|for
+von|from / of
+zu|to
+nach|to / after
+aus|out of / from
+bei|at / with
+seit|since / for
+bis|until
+hier|here
+dort|there
+links|left
+rechts|right
+immer|always
+manchmal|sometimes
+#26 Everyday expressions & small words
+hallo|hello
+guten Morgen|good morning
+guten Tag|hello / good day
+guten Abend|good evening
+gute Nacht|good night
+tschüss|bye
+auf Wiedersehen|goodbye
+bitte|please / you're welcome
+danke|thank you
+Entschuldigung|excuse me / sorry
+es tut mir leid|I'm sorry
+ja|yes
+nein|no
+nicht|not
+doch|yes, contradicting a negative
+vielleicht|perhaps
+gern|gladly / with pleasure
+leider|unfortunately
+sehr|very
+zu viel|too much
+noch|still / more
+schon|already
+nur|only
+zusammen|together
+zum Beispiel|for example
+#Goethe extra: Verbs
+abgeben|to hand in / give back
+anbieten|to offer
+anklicken|to click on
+anmachen|to switch on
+ausmachen|to switch off
+sich anmelden|to register / sign up
+aussehen|to look (appear)
+bedeuten|to mean
+beginnen|to begin
+benutzen|to use
+besichtigen|to visit (sights)
+bitten|to ask / request
+buchstabieren|to spell
+danken|to thank
+dauern|to last / take (time)
+drücken|to press
+empfehlen|to recommend
+enden|to end
+erlauben|to allow
+erzählen|to tell / narrate
+feiern|to celebrate
+sich freuen|to be pleased / look forward
+frühstücken|to have breakfast
+gefallen|to please / be liked
+gehören|to belong to
+gewinnen|to win
+glauben|to believe / think
+gratulieren|to congratulate
+grillen|to barbecue
+halten|to stop / hold
+heiraten|to marry
+kennenlernen|to get to know
+kriegen|to get
+sich kümmern|to take care of
+lachen|to laugh
+legen|to lay / put down flat
+lieben|to love
+liegen|to lie / be located
+mieten|to rent
+mitmachen|to join in
+mitnehmen|to take along
+Rad fahren|to cycle
+rauchen|to smoke
+regnen|to rain
+reparieren|to repair
+riechen|to smell
+scheinen|to shine / seem
+schmecken|to taste
+sitzen|to sit
+stehen|to stand
+stellen|to put upright
+studieren|to study (at university)
+überweisen|to transfer (money)
+umziehen|to move house
+verdienen|to earn
+vermieten|to rent out / let
+sich vorstellen|to introduce oneself
+weh tun|to hurt
+zahlen|to pay
+ankreuzen|to tick / mark with a cross
+ergänzen|to complete
+zuordnen|to match
+#Goethe extra: Nouns
+der Absender|sender
+die Anrede|salutation
+der Anruf|phone call
+der Anrufbeantworter|answering machine
+die Ansage|announcement
+der Anschluss|connection
+die Anzeige|advertisement
+das Apartment|apartment
+der Appetit|appetite
+der Arbeitsplatz|workplace
+die Aufgabe|task / exercise
+der Ausflug|excursion / outing
+die Auskunft|information (given)
+das Ausland|foreign country / abroad
+der Ausländer|foreigner
+die Aussage|statement
+die Autobahn|motorway
+der Automat|vending / ticket machine
+der Baum|tree
+der Beamte|civil servant / official
+der Bleistift|pencil
+die Birne|pear
+der Blick|view
+die Blume|flower
+der Bogen|sheet (of paper)
+der Buchstabe|letter (of the alphabet)
+die CD|CD
+die Dame|lady
+die Disco|disco
+der Doktor|doctor
+das Doppelzimmer|double room
+die Durchsage|public announcement
+die Ecke|corner
+der Ehemann|husband
+die Ehefrau|wife
+der Eintritt|admission / entry fee
+das Einzelzimmer|single room
+der Empfänger|recipient
+das Ende|end
+der Anfang|beginning
+das Ergebnis|result
+der Erwachsene|adult
+der Fahrer|driver
+das Fax|fax
+der Fehler|mistake
+das Feuer|fire / a light
+der Film|film
+die Freizeit|free time
+die Führung|guided tour
+der Fußball|football
+das Geburtsjahr|year of birth
+das Geschenk|present / gift
+das Gespräch|conversation
+das Getränk|drink
+das Gewicht|weight
+das Glück|luck / happiness
+der Glückwunsch|congratulations
+der Grad|degree
+die Großeltern|grandparents
+die Gruppe|group
+der Gruß|greeting
+die Halbpension|half board
+die Halle|hall
+die Hausfrau|housewife
+die Heimat|home / homeland
+der Herr|gentleman / Mr
+das Hobby|hobby
+der Hund|dog
+der Jugendliche|teenager / young person
+die Karte|card / menu / map
+der Kindergarten|nursery school
+das Kino|cinema
+der Kiosk|kiosk
+die Klasse|class
+das Konto|bank account
+der Kugelschreiber|ballpoint pen
+der Kunde|customer
+das Leben|life
+die Lebensmittel|groceries
+die Leute|people
+das Licht|light
+das Lied|song
+der Lkw|lorry / truck
+das Lokal|pub / restaurant
+die Lösung|solution
+die Maschine|machine
+das Meer|sea
+die Miete|rent
+die Mitte|middle
+die Möbel|furniture
+der Moment|moment
+die Oma|grandma
+der Opa|grandpa
+die Ordnung|order
+der Ort|place / town
+die Papiere|papers / documents
+die Party|party
+die Pause|break
+der Plan|plan / map
+der Platz|seat / square / place
+die Pommes frites|chips / French fries
+das Praktikum|internship
+die Praxis|doctor's practice
+das Problem|problem
+der Prospekt|brochure
+der Raum|room / space
+der Regen|rain
+die Reparatur|repair
+das Reisebüro|travel agency
+der Reiseführer|guidebook / tour guide
+der Satz|sentence
+der Schalter|counter / ticket window
+das Schild|sign
+der Schinken|ham
+der Schluss|end / conclusion
+das Schwimmbad|swimming pool
+der See|lake
+die Sehenswürdigkeit|sight / attraction
+die Sonne|sun
+der Sport|sport
+die Stelle|job / position / place
+der Stock|floor / storey
+das Studium|university studies
+der Test|test
+der Text|text
+das Thema|topic
+das Ticket|ticket
+der Vermieter|landlord
+der Verein|club / association
+der Verwandte|relative
+die Vorsicht|caution
+die Vorwahl|area code
+die Welt|world
+das Wetter|weather
+der Wind|wind
+die Zigarette|cigarette
+der Zoll|customs
+der Antwortbogen|answer sheet
+die Anmeldung|registration
+die Einladung|invitation
+die Antwort|answer
+die Frage|question
+das Essen|food / meal
+der Dank|thanks
+die Bitte|request
+der Abflug|flight departure
+der Wochentag|weekday
+der Familienname|family name
+der Familienstand|marital status
+die Farbe|colour
+der Feiertag|public holiday
+das Wort|word
+der Teil|part
+#Goethe extra: Adjectives & small words
+ab|from / starting at
+allein|alone
+also|so / therefore
+ander-|other
+bald|soon
+beide|both
+bekannt|well-known
+besetzt|occupied / engaged
+besser|better
+best-|best
+bisschen|a little bit
+bitter|bitter
+böse|angry / evil
+breit|wide
+circa|approximately
+da|there / here
+daneben|next to it
+dann|then
+draußen|outside
+durch|through
+eilig|in a hurry
+einmal|once
+fremd|foreign / strange
+früher|earlier / formerly
+geboren|born
+gerade|just now / straight
+geradeaus|straight ahead
+gestorben|died / dead
+gleich|same / immediately
+gültig|valid
+hell|light / bright
+hinten|at the back
+international|international
+klar|clear / of course
+kulturell|cultural
+leise|quiet / soft
+letzt-|last
+lieb|dear
+lieber|rather / preferably
+lustig|funny
+männlich|male
+weiblich|female
+mehr|more
+meist-|most
+nächst-|next
+nichts|nothing
+nie|never
+normal|normal
+oben|up / above / upstairs
+unten|down / below / downstairs
+oft|often
+pünktlich|punctual / on time
+selbstständig|self-employed / independent
+so|so / like this
+verboten|forbidden
+weit|far / wide
+weiter|further / on
+wunderbar|wonderful
+zurück|back
+zurzeit|at the moment
+arbeitslos|unemployed
+geöffnet|open
+geschlossen|closed
+erlaubt|allowed
+ausländisch|foreign
+automatisch|automatic
+herzlich|warm / heartfelt
+willkommen|welcome
+gegen|against
+um|at / around
+an sein|to be on (light)
+aus sein|to be off / over
+auf sein|to be open
+zu sein|to be closed
+weg sein|to be gone
+#Goethe extra: Phrases
+Alles Gute!|All the best!
+Guten Appetit!|Enjoy your meal!
+Herzlichen Glückwunsch!|Congratulations!
+Vielen Dank!|Thanks a lot!
+Herzlichen Dank!|Many thanks!
+Danke sehr!|Thank you very much!
+Wie geht's?|How are you?
+Wie bitte?|Pardon?
+Viel Glück!|Good luck!
+Das macht nichts.|It doesn't matter.
+Schönen Urlaub!|Have a nice holiday!
+Ein gutes neues Jahr!|Happy New Year!
+Herzlich willkommen!|Welcome!
+Auf Wiederhören!|Goodbye (on the phone)
+Mit freundlichen Grüßen|Yours sincerely
+Sehr geehrte Damen und Herren|Dear Sir or Madam
+Einen Moment bitte.|Just a moment, please.
+Wie heißt das auf Deutsch?|What is that called in German?
+Wie alt sind Sie?|How old are you?
+Woher kommen Sie?|Where do you come from?
+Was sind Sie von Beruf?|What do you do for a living?
+Wie viel kostet das?|How much does that cost?
+Die Rechnung, bitte.|The bill, please.
+Zahlen, bitte!|Can I pay, please?
+Kann ich mit Karte zahlen?|Can I pay by card?
+Ich habe Hunger.|I am hungry.
+Ich habe Durst.|I am thirsty.
+Das gefällt mir.|I like that.
+Das geht nicht!|That's not possible!
+In Ordnung.|All right / OK.
+Klar!|Sure!
+zu Hause|at home
+nach Hause|(to) home
+zu Fuß|on foot
+Tut mir leid.|I'm sorry.
+Vorsicht!|Careful!
+Achtung!|Attention!
+Hilfe!|Help!
+Wo ist die Toilette, bitte?|Where is the toilet, please?
+Bitte buchstabieren Sie Ihren Namen.|Please spell your name.
+Können Sie das bitte wiederholen?|Can you repeat that, please?
+Könnten Sie bitte langsamer sprechen?|Could you please speak more slowly?
+Wir möchten bestellen, bitte.|We would like to order, please.
+#Goethe extra: Numbers, units & directions
+einundzwanzig|twenty-one
+dreißig|thirty
+vierzig|forty
+fünfzig|fifty
+sechzig|sixty
+siebzig|seventy
+achtzig|eighty
+neunzig|ninety
+hunderteins|one hundred and one
+zweihundert|two hundred
+eine Million|one million
+eine Milliarde|one billion
+erste|first
+zweite|second (ordinal)
+dritte|third
+vierte|fourth
+ein halb|one half
+ein Viertel|a quarter
+halb drei|half past two
+Viertel nach|quarter past
+Viertel vor|quarter to
+der Meter|metre
+der Zentimeter|centimetre
+der Kilometer|kilometre
+der Quadratmeter|square metre
+das Prozent|per cent
+der Liter|litre
+das Gramm|gram
+das Pfund|pound (500 g)
+der Norden|north
+der Süden|south
+der Westen|west
+der Osten|east
+#Goethe extra: Countries & nationalities
+Deutschland|Germany
+der Deutsche|German (man)
+deutsch|German (adjective)
+Europa|Europe
+der Europäer|European (person)
+europäisch|European (adjective)
+die Türkei|Turkey
+türkisch|Turkish
+Finnland|Finland
+finnisch|Finnish
+Mexiko|Mexico
+mexikanisch|Mexican
+Österreich|Austria
+die Schweiz|Switzerland
+Spanien|Spain
+Italien|Italy
+Frankreich|France
+Brasilien|Brazil
+China|China
+Japan|Japan
+Polen|Poland`;
+
+/* ====== PARSE ====== */
+const pool=[], cats=[], seen=new Set();
+(function(){
+  let cur='';
+  RAW.split('\n').forEach(line=>{
+    line=line.trim(); if(!line) return;
+    if(line[0]==='#'){cur=line.slice(1).trim();cats.push(cur);return;}
+    const i=line.indexOf('|'); const de=line.slice(0,i).trim(), en=line.slice(i+1).trim();
+    if(seen.has(de)) return; seen.add(de);
+    const m=de.match(/^(der|die|das) /);
+    let type='word';
+    if(m) type='noun'; else if(/^to /.test(en)||/^(können|müssen|dürfen|sollen|wollen|mögen|möchten)$/.test(de)) type='verb';
+    else if(cur.indexOf('Phrases')>-1||/[!?.]$/.test(de)||de.split(' ').length>3) type='phrase';
+    pool.push({id:pool.length,de,en,cat:cur,type,art:m?m[1]:null});
+  });
+})();
+
+/* ====== HELPERS ====== */
+const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+function shuffle(a){a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;}
+function deHTML(c){const m=c.de.match(/^(der|die|das) (.+)$/);return m?`<span class="art ${m[1]}">${m[1]}</span> ${esc(m[2])}`:esc(c.de);}
+function speak(t){try{if(!window.speechSynthesis)return;speechSynthesis.cancel();const u=new SpeechSynthesisUtterance(t);u.lang='de-DE';u.rate=.85;speechSynthesis.speak(u);}catch(e){}}
+let known=new Set();
+try{known=new Set(JSON.parse(localStorage.getItem('a1known')||'[]'));}catch(e){}
+function saveKnown(){try{localStorage.setItem('a1known',JSON.stringify([...known]));}catch(e){}updateStats();}
+function updateStats(){$('#stats').textContent=`${pool.length} cards · ${known.size} marked as known`;}
+const typeLabel={noun:'Noun',verb:'Verb',phrase:'Phrase',word:'Word'};
+
+/* ====== TABS & SELECTS ====== */
+function fillCats(sel){sel.innerHTML='<option value="all">All categories ('+pool.length+')</option>'+cats.map(c=>`<option value="${esc(c)}">${esc(c)} (${pool.filter(p=>p.cat===c).length})</option>`).join('');}
+fillCats($('#fcCat'));fillCats($('#qCat'));updateStats();
+$$('.tabs button').forEach(b=>b.onclick=()=>{
+  $$('.tabs button').forEach(x=>x.classList.toggle('active',x===b));
+  $('#cards').hidden=b.dataset.tab!=='cards';$('#quiz').hidden=b.dataset.tab!=='quiz';
+});
+
+/* ====== FLASHCARDS ====== */
+let deck=[], idx=0;
+const card=$('#card');
+function buildDeck(keepShuffle){
+  const cat=$('#fcCat').value, hide=$('#hideKnown').checked;
+  deck=pool.filter(c=>(cat==='all'||c.cat===cat)&&!(hide&&known.has(c.id)));
+  if(keepShuffle) deck=shuffle(deck);
+  idx=0;renderCard(true);
+}
+function renderCard(instant){
+  const n=deck.length;
+  $('#fcCounter').textContent=n?`Card ${idx+1} of ${n}`:'No cards here – clear "Hide known" or pick another category.';
+  const c=deck[idx];
+  const apply=()=>{
+    if(!c){$('#fWord').textContent='🎉';$('#bWord').textContent='';return;}
+    const deFirst=$('#fcDir').value==='de';
+    const f=deFirst?deHTML(c):esc(c.en), b=deFirst?esc(c.en):deHTML(c);
+    $('#fWord').innerHTML=f;$('#bWord').innerHTML=b;
+    $('#fWord').className='word'+(f.length>40?' long':'');$('#bWord').className='word'+(b.length>40?' long':'');
+    ['fTag','bTag'].forEach(id=>$('#'+id).textContent=c.cat);
+    ['fType','bType'].forEach(id=>$('#'+id).textContent=(known.has(c.id)?'✓ ':'')+typeLabel[c.type]);
+  };
+  if(instant){card.style.transition='none';card.classList.remove('flipped');void card.offsetWidth;apply();card.style.transition='';}
+  else apply();
+}
+function go(d){if(!deck.length)return;idx=(idx+d+deck.length)%deck.length;renderCard(true);}
+card.onclick=()=>card.classList.toggle('flipped');
+$('#nextBtn').onclick=()=>go(1);$('#prevBtn').onclick=()=>go(-1);
+$('#knownBtn').onclick=()=>{const c=deck[idx];if(!c)return;known.add(c.id);saveKnown();if($('#hideKnown').checked){deck.splice(idx,1);if(idx>=deck.length)idx=0;}else{idx=(idx+1)%deck.length;}renderCard(true);};
+$('#againBtn').onclick=()=>{const c=deck[idx];if(!c)return;known.delete(c.id);saveKnown();go(1);};
+$('#shuffleBtn').onclick=()=>buildDeck(true);
+$('#fcCat').onchange=()=>buildDeck(false);$('#hideKnown').onchange=()=>buildDeck(false);
+$('#fcDir').onchange=()=>renderCard(true);
+$('#speakBtn').onclick=e=>{e.stopPropagation();if(deck[idx])speak(deck[idx].de);};
+$('#resetKnown').onclick=()=>{if(confirm('Clear all "known" marks?')){known.clear();saveKnown();buildDeck(false);}};
+buildDeck(false);
+
+/* ====== QUIZ ====== */
+let qNumVal=10;
+function qPool(){const c=$('#qCat').value;return pool.filter(p=>c==='all'||p.cat===c);}
+function refreshSetup(){
+  const max=qPool().length;
+  const presets=[10,25,50,100,250,600].filter(n=>n<max);
+  $('#numChips').innerHTML=presets.map(n=>`<button class="chip" data-n="${n}">${n}</button>`).join('')+`<button class="chip" data-n="${max}">All (${max})</button>`;
+  $$('#numChips .chip').forEach(ch=>ch.onclick=()=>{$('#numInput').value=ch.dataset.n;markChip();});
+  $('#numInput').max=max;
+  $('#poolInfo').textContent=`(${max} available in this category)`;
+  if(+$('#numInput').value>max)$('#numInput').value=max;
+  markChip();
+}
+function markChip(){$$('#numChips .chip').forEach(ch=>ch.classList.toggle('on',ch.dataset.n===String($('#numInput').value)));}
+$('#numInput').oninput=markChip;$('#qCat').onchange=refreshSetup;refreshSetup();
+
+function overlap(a,b){a=a.toLowerCase();b=b.toLowerCase();return a===b||a.includes(b)||b.includes(a);}
+function makeOptions(c,dir){
+  const key=dir==='de'?'en':'de';
+  const scored=[];
+  for(const o of pool){
+    if(o===c) continue;
+    if(overlap(o[key],c[key])||overlap(o.en,c.en)) continue;
+    let s=Math.random()*2;
+    if(o.type===c.type)s+=4;
+    if(o.cat===c.cat)s+=3;
+    if(c.art&&o.art===c.art)s+=2;
+    s-=Math.abs(o[key].length-c[key].length)/5;
+    if(key==='de'&&o.de[0].toLowerCase()===c.de[0].toLowerCase())s+=1;
+    if(key==='en'&&o.en.split(' ')[0]===c.en.split(' ')[0])s+=1.5;
+    scored.push([s,o]);
+  }
+  scored.sort((a,b)=>b[0]-a[0]);
+  const out=[],used=new Set([c[key].toLowerCase()]);
+  for(const [,o] of scored){const k=o[key].toLowerCase();if(used.has(k))continue;used.add(k);out.push(o);if(out.length===5)break;}
+  return shuffle([c,...out]).map(o=>({card:o,text:o[key],correct:o===c}));
+}
+let Q={qs:[],i:0,score:0,wrong:[],done:false,dir:'de'};
+function startQuiz(list,dirSel){
+  Q={qs:list.map(c=>({c,dir:dirSel==='mix'?(Math.random()<.5?'de':'en'):dirSel})),i:0,score:0,wrong:[],done:false,dirSel};
+  $('#setup').hidden=true;$('#result').hidden=true;$('#play').hidden=false;showQ();
+}
+$('#startQuiz').onclick=()=>{
+  const p=qPool();let n=parseInt($('#numInput').value)||10;n=Math.max(1,Math.min(n,p.length));
+  startQuiz(shuffle(p).slice(0,n),$('#qDir').value);
+};
+function showQ(){
+  const {c,dir}=Q.qs[Q.i];
+  $('#qNum').textContent=`Question ${Q.i+1} of ${Q.qs.length}`;
+  $('#qScore').textContent=`Score: ${Q.score}`;
+  $('#qProg').style.width=(Q.i/Q.qs.length*100)+'%';
+  $('#qPrompt').textContent=dir==='de'?'What does this mean in English?':'How do you say this in German?';
+  $('#qWord').innerHTML=dir==='de'?deHTML(c):esc(c.en);
+  $('#qWord').className='word'+((dir==='de'?c.de:c.en).length>34?' long':'');
+  $('#qSpeak').hidden=dir!=='de';
+  const opts=makeOptions(c,dir);Q.cur=opts;Q.answered=false;
+  $('#opts').innerHTML=opts.map((o,k)=>`<button class="opt" data-k="${k}"><b>${k+1}</b><span>${esc(o.text)}</span></button>`).join('');
+  $$('#opts .opt').forEach(b=>b.onclick=()=>answer(+b.dataset.k));
+  $('#feedback').textContent='';$('#feedback').className='feedback';
+  $('#qNext').disabled=true;$('#qNext').textContent=Q.i===Q.qs.length-1?'Finish ✓':'Next →';
+}
+function answer(k){
+  if(Q.answered)return;Q.answered=true;
+  const {c,dir}=Q.qs[Q.i];const btns=$$('#opts .opt');
+  btns.forEach((b,j)=>{b.disabled=true;if(Q.cur[j].correct)b.classList.add('right');});
+  const ok=Q.cur[k].correct;
+  if(ok)Q.score++;else{btns[k].classList.add('wrong');Q.wrong.push(c);}
+  const fb=$('#feedback');fb.className='feedback '+(ok?'ok':'no');
+  fb.textContent=(ok?'✓ Correct!  ':'✗ Not quite.  ')+c.de+'  =  '+c.en;
+  $('#qScore').textContent=`Score: ${Q.score}`;
+  $('#qNext').disabled=false;
+  if(ok&&dir==='de')speak(c.de);
+}
+function nextQ(){
+  if($('#qNext').disabled)return;
+  if(Q.i>=Q.qs.length-1)return finish();
+  Q.i++;showQ();
+}
+$('#qNext').onclick=nextQ;
+$('#qSpeak').onclick=()=>speak(Q.qs[Q.i].c.de);
+function finish(){
+  $('#qProg').style.width='100%';$('#play').hidden=true;$('#result').hidden=false;
+  const n=Q.qs.length,p=Math.round(Q.score/n*100);
+  $('#rScore').textContent=`${Q.score} / ${n}  (${p}%)`;
+  $('#rMsg').textContent=p===100?'Perfekt! 🏆':p>=80?'Sehr gut! 🎉':p>=60?'Gut gemacht – keep going! 💪':'Keep practising – you will get there! 📚';
+  const uniq=[...new Set(Q.wrong)];
+  $('#rMissedWrap').hidden=!uniq.length;
+  $('#missed').innerHTML=uniq.map(c=>`<div><span>${deHTML(c)}</span><span>${esc(c.en)}</span></div>`).join('');
+  $('#retryMissed').hidden=!uniq.length;Q.missed=uniq;
+}
+$('#retryMissed').onclick=()=>startQuiz(shuffle(Q.missed),Q.dirSel);
+$('#newQuiz').onclick=()=>{$('#result').hidden=true;$('#play').hidden=true;$('#setup').hidden=false;};
+
+/* ====== KEYBOARD ====== */
+document.addEventListener('keydown',e=>{
+  if(['INPUT','SELECT','TEXTAREA'].includes(e.target.tagName))return;
+  if(!$('#cards').hidden){
+    if(e.key==='ArrowRight')go(1);else if(e.key==='ArrowLeft')go(-1);
+    else if(e.key===' '||e.key==='Enter'){e.preventDefault();card.classList.toggle('flipped');}
+    else if(e.key.toLowerCase()==='k')$('#knownBtn').click();
+  }else if(!$('#play').hidden){
+    if(/^[1-6]$/.test(e.key))answer(+e.key-1);
+    else if(e.key==='Enter'||e.key===' '||e.key==='ArrowRight'){e.preventDefault();nextQ();}
+  }
+});
+</script>
+</body>
+</html>
